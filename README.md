@@ -6,8 +6,9 @@
 * Optionally shallow render components
 * Simulate simple DOM events (click, input, etc.)
 * Use any test runner / assertion library
+* Mock and stub vuex actions and getters
 
-Unlike other component testing libraries, VueUnit does not focus on DOM traversal. Instead it focuses on making programmatic manipulation of your components much easier. For DOM traversal and assertions it's strongly recommended to use a library such as [`chai-jquery`](https://github.com/chaijs/chai-jquery) or [`jasmine-jquery`](https://github.com/velesin/jasmine-jquery).
+Unlike other component testing libraries, VueUnit does not focus on DOM traversal. Instead it focuses on making programmatic manipulation of your components much easier. For DOM traversal and assertions it's strongly recommended to use a library such as [`chai-jquery`](http://chaijs.com/plugins/chai-jquery/) or [`jasmine-jquery`](https://github.com/velesin/jasmine-jquery).
 
 * [Installation](#installation)
 * [Usage](#usage)
@@ -36,7 +37,7 @@ VueUnit requires `"vue": "2.*"` to be installed, using the [standalone build](ht
 
 ## <a name="usage"></a>Usage
 
-Examples shown are using mocha, chai, sinon, and chai-jquery but you should be able to extrapolate to your framework of choice.
+Examples shown are using [mocha](https://mochajs.org/), [chai](http://chaijs.com/), [sinon](http://sinonjs.org/), and [chai-jquery](http://chaijs.com/plugins/chai-jquery/) but you should be able to extrapolate to your framework of choice.
 
 ### <a name="hooks"></a>Hooks
 
@@ -58,16 +59,15 @@ describe('My test', () => {
 })
 ```
 
-You should assume all example tests shown are using these hooks.
+**You should assume all example tests shown are using these hooks.**
 
 ### <a name="mount"></a>`mount()`
 
-The `mount()` function renders components and allows setting prop data, listen for events, or put content into slots.
+The `mount()` function renders components and allows setting props, listening for events, or putting content into slots.
 
 ```js
 import { mount } from 'vue-unit'
 ```
-
 
 #### <a name="basic-component"></a>Basic Component
 
@@ -82,7 +82,7 @@ it('mounts a basic component', () => {
 })
 ```
 
-The first argument `mount()` expects is a component options object.
+The first argument `mount()` expects is a Vue component.
 
 #### <a name="component-with-props"></a>Component with props
 
@@ -267,9 +267,10 @@ This can be helpful when your components has many selectors you want to test.
 
 ### <a name="simulate"></a>`simulate(element, event)`
 
-The `simulate()` function will trigger an HTML event on given DOM element. It can accept an DOM node or jQuery object.
+The `simulate()` function will trigger an HTML event on given DOM element. It can accept an DOM element or jQuery object.
 
 For example, triggering a click event on a button would look like so:
+
 ```js
 const button1 = $('button')
 simulate(button1, 'click')
@@ -278,14 +279,13 @@ const button2 = document.querySelector('button')
 simulate(button2, 'click')
 ```
 
-
 ### Vuex Testing
 
 VueUnit also provides helpers for isolating components from vuex getters and actions in form of `fakeGetters()` and `fakeActions()`. These functions must be called **before** mounting your component.
 
 #### <a name="fake-getters"></a>`fakeGetters()`
 
-The `fakeGetters()` returns a sinon stub which can be used to (optionally) control the value which the getter returns.
+The `fakeGetters()` function returns a [sinon](http://sinonjs.org/) stub which can be used to (optionally) control the value which the getter returns.
 
 For example given this component:
 ```js
@@ -302,14 +302,14 @@ We might test it like so:
 ```js
 it('fakes a getter', () => {
   const foo = fakeGetters('foo').returns(1234)
-  const component = mount(Component)
-  expect(component.someValue).to.equal(1234)
+  const vm = mount(Component)
+  expect(vm.someValue).to.equal(1234)
 })
 
 it('fakes a getter in a different way', () => {
   fakeGetters('foo', 1234)
-  const component = mount(Component)
-  expect(component.someValue).to.equal(1234)
+  const vm = mount(Component)
+  expect(vm.someValue).to.equal(1234)
 })
 
 it('fakes multiple getters', () => {
@@ -317,15 +317,15 @@ it('fakes multiple getters', () => {
     foo: 1234,
     bar: 5678
   })
-  const component = mount(Component)
-  expect(component.someValue).to.equal(1234)
-  expect(component.otherValue).to.equal(5678)
+  const vm = mount(Component)
+  expect(vm.someValue).to.equal(1234)
+  expect(vm.otherValue).to.equal(5678)
 })
 ```
 
 #### <a name="fake-actions"></a>`fakeActions()`
 
-The `fakeAction()` returns a sinon stub which can be used to spy on the action and control what it returns.
+The `fakeActions()` function returns a [sinon](http://sinonjs.org/) stub which can be used to spy on the action and control what it returns.
 
 For example given this component:
 
@@ -337,13 +337,14 @@ const Component = {
   }
 }
 ```
+
 We might test it like so:
 
 ```js
 it ('dispatches an action', () => {
   const fooAction = fakeActions('foo').returns('bar')
-  const component = mount(Component)
-  return component.someMethod(1234).then(value => {
+  const vm = mount(Component)
+  return vm.someMethod(1234).then(value => {
     expect(fooAction).to.have.been.calledOnce.and.calledWith(1234)
     expect(value).to.equal('bar')
   })
@@ -356,4 +357,4 @@ More sample usage can be found in the [examples/](https://github.com/wrseward/vu
 
 ## <a name="license"></a>License
 
-[MIT](https://github.com/wrseward/vue-unit/blob/master/LICENSE.md)
+[MIT](https://github.com/wrseward/vue-unit/blob/master/LICENSE)

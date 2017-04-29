@@ -18,18 +18,18 @@ describe('fakeActions', () => {
 
   it('returns a sinon stub for a given action', () => {
     const bar = fakeActions('bar')
-    const component = mount(ComponentWithActions)
+    const vm = mount(ComponentWithActions)
 
-    component.foo()
+    vm.foo()
 
     expect(bar).to.have.been.calledOnce
   })
 
   it('can assert against what arguments an action was dispatched with', () => {
     const bar = fakeActions('bar')
-    const component = mount(ComponentWithActions)
+    const vm = mount(ComponentWithActions)
 
-    component.foo({ one: 1, two: 2 })
+    vm.foo({ one: 1, two: 2 })
 
     expect(bar).to.have.been.calledOnce.and.calledWith({ one: 1, two: 2 })
   })
@@ -37,9 +37,9 @@ describe('fakeActions', () => {
   it('can stub what the action returns using sinon', () => {
     const action = fakeActions('bar').returns(Promise.resolve('baz'))
 
-    const component = mount(ComponentWithActions)
+    const vm = mount(ComponentWithActions)
 
-    return component.foo().then(message => {
+    return vm.foo().then(message => {
       expect(action).to.have.been.calledOnce
       expect(message).to.equal('baz')
     })
@@ -51,13 +51,13 @@ describe('fakeActions', () => {
       qaz: Promise.resolve(2)
     })
 
-    const component = mount(ComponentWithActions)
+    const vm = mount(ComponentWithActions)
 
-    return component.foo().then(message => {
+    return vm.foo().then(message => {
       expect(message).to.equal(1)
-      return component.qux().then(message => {
-        expect(message).to.equal(2)
-      })
+      return vm.qux()
+    }).then(message => {
+      expect(message).to.equal(2)
     })
   })
 })
