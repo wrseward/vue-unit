@@ -8,8 +8,16 @@
     "test": "NODE_ENV=test karma start test/karma.conf.js --single-run",
     "lint": "eslint --format 'node_modules/eslint-friendly-formatter' --ext .js,.vue src test/specs"
   },
+  "keywords": [
+    "vue",
+    "vue-unit"
+  ],
   "author": "William Seward <wrseward@gmail.com>",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wrseward/vue-unit/issues"
+  },
+  "homepage": "https://github.com/wrseward/vue-unit#readme",
   "devDependencies": {
     "babel-cli": "^6.18.0",
     "babel-core": "^6.21.0",
