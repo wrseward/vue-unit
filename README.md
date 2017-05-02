@@ -23,6 +23,7 @@ Unlike other component testing libraries, VueUnit does not focus on DOM traversa
   * [`shallow()`](#shallow)
   * [`build()` and `buildShallow()`](#build-and-build-shallow)
   * [`simulate(element, event)`](#simulate)
+  * [`waitForUpdate(cb)`](#wait-for-update)
   * [`Vuex testing`](#vuex-testing)
     * [`fakeGetters()`](#fake-getters)
     * [`fakeActions()`](#fake-actions)
@@ -278,6 +279,51 @@ simulate(button1, 'click')
 const button2 = document.querySelector('button')
 simulate(button2, 'click')
 ```
+
+### <a name="wait-for-update"></a>`waitForUpdate(cb)`
+
+The `waitForUpdate()` helper function can be used to clean up a chain of async DOM assertions that you would normally have to use `Vue.nextTick()` for.
+
+For example we could rewrite the following test:
+
+```js
+const Component = {
+  template: `<p>{{ message }}</p>`,
+  props: ['message']
+}
+
+it('tests message updates', () => {
+  const vm = mount(Component, { message: 'Hello' })
+  expect($(vm.$el)).to.have.text('Hello')
+  vm.message = 'World'
+  return vm.$nextTick().then(() => {
+    expect($(vm.$el)).to.have.text('World')
+    vm.message = 'VueUnit'
+    return vm.$nextTick()
+  }).then(() => {
+    expect($(vm.$el)).to.have.text('VueUnit')
+  })
+})
+```
+
+like so:
+
+```js
+it('tests message updates', () => {
+  const vm = mount(Component, { message: 'Hello' })
+  console.log(done)
+
+  expect($(vm.$el)).to.have.text('Hello')
+  vm.message = 'World'
+  waitForUpdate(() => {
+    expect($(vm.$el)).to.have.text('World')
+    vm.message = 'VueUnit'
+  }).then(() => {
+    expect($(vm.$el)).to.have.text('VueUnit')
+  }).end(done)
+```
+
+Please note when using `waitForUpdate()` use **must** end your chain of assertions with `.end(done)` to avoid errors.
 
 ### Vuex Testing
 

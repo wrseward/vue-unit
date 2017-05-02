@@ -2,6 +2,8 @@ import Vue from 'vue'
 import sinon from 'sinon'
 import kebabCase from 'lodash.kebabcase'
 
+export { default as waitForUpdate } from './wait-for-update'
+
 let originalIgnoredElements
 let mountedInstances = []
 let actions = {}
