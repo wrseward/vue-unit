@@ -311,7 +311,6 @@ like so:
 ```js
 it('tests message updates', () => {
   const vm = mount(Component, { message: 'Hello' })
-  console.log(done)
 
   expect($(vm.$el)).to.have.text('Hello')
   vm.message = 'World'
