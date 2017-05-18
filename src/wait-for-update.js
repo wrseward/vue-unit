@@ -13,7 +13,7 @@ import Vue from 'vue'
 // .then(() => {
 //   // more assertions...
 // })
-// .then(done)
+// .end(done)
 
 export default initialCb => {
   let end
@@ -29,7 +29,9 @@ export default initialCb => {
         hasError = true
         const done = queue[queue.length - 1]
         if (done && done.fail) {
-          done.fail(e)
+          done.fail(e) // Jasmine behaviour
+        } else if (done) {
+          done(e) // Mocha behaviour
         }
       }
       if (!hasError && !job.wait) {
@@ -44,7 +46,7 @@ export default initialCb => {
 
   Vue.nextTick(() => {
     if (!queue.length || (!end && !queue[queue.length - 1].fail)) {
-      throw new Error('waitForUpdate chain is missing .then(done)')
+      throw new Error('waitForUpdate chain is missing .end(done)')
     }
     shift()
   })
