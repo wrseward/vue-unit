@@ -9,23 +9,27 @@ let mountedInstances = []
 let actions = {}
 let getters = {}
 
-export function mount (component, props = {}, on = {}, slots = {}, callback) {
+export function mount (component, props = {}, on = {}, slots = {}, provide = {}, callback) {
   if (arguments.length === 2 && typeof props === 'function') {
-    return mount(component, {}, {}, {}, props)
+    return mount(component, {}, {}, {}, {}, props)
   }
 
   if (arguments.length <= 3 && isOptions(props)) {
     const cb = typeof on === 'function' ? on : undefined
-    return mount(component, props.props, props.on, props.slots, cb)
+    return mount(component, props.props, props.on, props.slots, props.provide, cb)
   }
 
-  if (!isOptions(props) && arguments.length < 5 && typeof arguments[arguments.length - 1] === 'function') {
+  if (!isOptions(props) && arguments.length < 6 && typeof arguments[arguments.length - 1] === 'function') {
     if (typeof on === 'function') {
-      return mount(component, props, {}, {}, on)
+      return mount(component, props, {}, {}, {}, on)
     }
     /* istanbul ignore else */
     if (typeof slots === 'function') {
-      return mount(component, props, on, {}, slots)
+      return mount(component, props, on, {}, {}, slots)
+    }
+    /* istanbul ignore else */
+    if (typeof provide === 'function') {
+      return mount(component, props, on, slots, {}, provide)
     }
   }
 
@@ -36,7 +40,8 @@ export function mount (component, props = {}, on = {}, slots = {}, callback) {
     render: h => h(
       component,
       { props, on },
-      createSlots(slots, h))
+      createSlots(slots, h)),
+    provide: provide
   }
   const store = buildFakeStore()
 
@@ -60,7 +65,7 @@ export function mount (component, props = {}, on = {}, slots = {}, callback) {
 }
 
 function isOptions (object) {
-  return ('props' in object || 'event' in object || 'slots' in object)
+  return ('props' in object || 'event' in object || 'slots' in object || 'provide' in object)
 }
 
 function createSlots (slots, h) {
