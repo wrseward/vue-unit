@@ -65,7 +65,7 @@ export function mount (component, props = {}, on = {}, slots = {}, provide = {},
 }
 
 function isOptions (object) {
-  return ('props' in object || 'event' in object || 'slots' in object || 'provide' in object)
+  return ('props' in object || 'on' in object || 'slots' in object || 'provide' in object)
 }
 
 function createSlots (slots, h) {
