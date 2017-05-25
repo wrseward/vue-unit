@@ -19,6 +19,7 @@ Unlike other component testing libraries, VueUnit does not focus on DOM traversa
     * [Component with events](#component-with-events)
     * [Component with default slot](#component-with-default-slot)
     * [Component with multiple slots](#component-with-multiple-slots)
+    * [Component with injects](#component-with-injects)
   * [Options Object](#options-object)
   * [`shallow()`](#shallow)
   * [`build()` and `buildShallow()`](#build-and-build-shallow)
@@ -152,10 +153,30 @@ const ComponentWithMultipleSlots = {
     </div>
   `
 }
-  
+
 it('sets content for multiple slots', () => {
   mount(ComponentWithMultipleSlots, {}, {}, { default: 'Hello World', foo: '<p>Bar</p>' })
   expect($('.component')).to.have.html('Hello World <p>Bar</p>')
+})
+```
+
+The 4th argument `mount()` accepts is an object with values available to be injected via the provide/inject behaviour. It is equivalent to defining `provide` on an ancestor component.
+
+#### <a name="component-with-injects"></a>Component with injects
+
+```js
+const ComponentWithInjects = {
+  template: `
+    <div class="component">
+      Hello {{ message }}
+    </div>
+  `,
+  inject: ['message']
+}
+
+it('provides values to be injected', () => {
+  mount(ComponentWithInjects, {}, {}, {}, { message: 'World' })
+  expect($('.component')).to.have.text('Hello World')
 })
 ```
 
@@ -169,20 +190,23 @@ const ComponentWithAllOptions = {
       <slot name="foo"></slot>
     </div>
   `,
-  props: ['message']
+  props: ['message'],
+  inject: ['messageFromAncestor']
 }
-  
+
 it('uses an options object', () => {
   const listener = sinon.spy()
   const options = {
     props: { message: 'bar' },
     on: { foo: listener },
-    slots: { default: 'Hello World', foo: '<p>Bar</p>' }
+    slots: { default: 'Hello World', foo: '<p>Bar</p>' },
+    provide: { messageFromAncestor, 'bar' }
   }
-  mount(ComponentWithAllOptions, options)
+  vm = mount(ComponentWithAllOptions, options)
   expect($('.component')).to.have.html('Hello World <p>Bar</p>')
   simulate($('.component'), 'click')
   expect(listener).to.have.been.calledWith('bar')
+  expect(vm.messageFromAncestor).to.equal('bar')
 })
 ```
 
@@ -191,12 +215,13 @@ it('uses an options object', () => {
 | `props` | `{}` | `Object` | An object containing camelCased props to be passed to the component |
 | `on` | `{}` | `Object` | An object containing listeners to be called when an event is trigger by the component |
 | `slots` | `{}` | `Object` or `String` | String containing the template for the `default` slot of the component. Objects containing templates for slots (should be keyed by the slot name).
+| `provide` | `{}` | `Object` | An object simulating values given from parent components via Vue's `provide`. Available to the equivalent `inject` component property.
 
 ### <a name="shallow"></a>`shallow()`
 
 The `shallow()` function has the same signature as the `mount()` function, however it will shallow render the component by replacing any **locally registered** child components with an empty kebab-cased tag of their name.
 
-This enables you to test higher-level components without the concern of the required props or dependencies of nested child components. 
+This enables you to test higher-level components without the concern of the required props or dependencies of nested child components.
 
 For example:
 
