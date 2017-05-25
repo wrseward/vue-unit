@@ -76,6 +76,21 @@ describe('mount', () => {
     expect(callMount).to.throw(Error, 'Error when rendering default slot')
   })
 
+  it('mounts a component with provided dependencies', () => {
+      const ComponentWithInjects = {
+        template: '<div>Hello {{ valueFromInject }}</div>',
+        inject: ['providedValue'],
+        data () {
+          return {
+            valueFromInject: this.providedValue
+          }
+        }
+      }
+      const vm = mount(ComponentWithInjects, { provide: { providedValue: 'World' } })
+      expect(vm.$el.textContent).to.equal('Hello World')
+      expect(vm.providedValue).to.equal('World')
+  })
+
   it('receives an optional callback which is passed the vm after mounting', () => {
     const mounted = sinon.spy()
     const callback = sinon.spy()
@@ -103,7 +118,8 @@ describe('mount', () => {
     const options = {
       props: { message: 'Hello ' },
       on: { click },
-      slots: { default: '<span>World</span>' }
+      slots: { default: '<span>World</span>' },
+      provide: { injectedValue: 'test' }
     }
     const vm = mount(ComponentWithAllOptions, options)
     expect(vm.$el.innerHTML).to.equal('Hello <span>World</span>')
