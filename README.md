@@ -28,6 +28,7 @@ Unlike other component testing libraries, VueUnit does not focus on DOM traversa
   * [`Vuex testing`](#vuex-testing)
     * [`fakeGetters()`](#fake-getters)
     * [`fakeActions()`](#fake-actions)
+    * [`exposeState()`](#expose-state)
   * [Examples](#examples)
 * [License](#license)
 
@@ -353,6 +354,8 @@ Please note when using `waitForUpdate()` use **must** end your chain of assertio
 
 VueUnit also provides helpers for isolating components from vuex getters and actions in form of `fakeGetters()` and `fakeActions()`. These functions must be called **before** mounting your component.
 
+You can also manipulate Vuex state directly with `exposeState()`
+
 #### <a name="fake-getters"></a>`fakeGetters()`
 
 The `fakeGetters()` function returns a [sinon](http://sinonjs.org/) stub which can be used to (optionally) control the value which the getter returns.
@@ -418,6 +421,44 @@ it ('dispatches an action', () => {
     expect(fooAction).to.have.been.calledOnce.and.calledWith(1234)
     expect(value).to.equal('bar')
   })
+})
+```
+
+#### <a name="expose-state"></a>`exposeState()`
+The `exposeState()` function returns a plain object which you can populate with any state that you require in your Vuex store.
+
+
+```js
+const ComponentWithState = {
+  template: '<p></p>',
+  computed: {
+    localComputed () {
+      return this.$store.state.someItem
+    }
+  },
+  data () {
+    return {
+      localState: this.$store.state.someItem
+    }
+  }
+}
+```
+
+We might test it like so:
+
+```js
+it('allows state to be manipulated', () => {
+  const state = exposeState()
+  state.someItem = 'foobar'
+  const vm = mount(ComponentWithState)
+
+  expect(vm.localState).to.equal('foobar')
+  expect(vm.localComputed).to.equal('foobar')
+
+  state.someItem = 'barbaz'
+
+  expect(vm.localState).to.equal('foobar')
+  expect(vm.localComputed).to.equal('barbaz')
 })
 ```
 
