@@ -46,7 +46,7 @@
     "karma-sinon-chai": "^1.2.4",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "^0.0.26",
-    "karma-webpack": "^1.8.1",
+    "karma-webpack": "^2.0.3",
     "mocha": "^3.2.0",
     "phantomjs-prebuilt": "^2.1.14",
     "sinon-chai": "^2.8.0",
@@ -54,7 +54,7 @@
     "vue-loader": "^10.0.2",
     "vue-template-compiler": "^2.1.8",
     "vuex": "^2.3.1",
-    "webpack": "beta"
+    "webpack": "^3.2.0"
   },
   "peerDependencies": {
     "vue": "2.*"
