@@ -8,6 +8,7 @@ let originalIgnoredElements
 let mountedInstances = []
 let actions = {}
 let getters = {}
+let mutations = {}
 
 export function mount (component, props = {}, on = {}, slots = {}, provide = {}, callback) {
   if (arguments.length === 2 && typeof props === 'function') {
@@ -145,6 +146,7 @@ export function afterEachHooks () {
   mountedInstances = []
   actions = {}
   getters = {}
+  mutations = {}
   const div = document.querySelector('#vue-unit')
   if (div) div.remove()
   /* istanbul ignore else */
@@ -188,6 +190,18 @@ export function fakeGetters (getterName, returns) {
   return stub
 }
 
+export function fakeMutations (mutationName, returns) {
+  if (typeof mutationName === 'object') {
+    Object.keys(mutationName).forEach(key => {
+      fakeMutations(key, mutationName[key])
+    })
+  }
+  const stub = sinon.stub()
+  if (returns) stub.returns(returns)
+  mutations[mutationName] = (context, ...args) => stub(...args)
+  return stub
+}
+
 function buildFakeStore () {
   let Vuex
 
@@ -198,12 +212,13 @@ function buildFakeStore () {
     return null
   }
 
-  if (!Object.keys(actions).length && !Object.keys(getters).length) {
+  if (!Object.keys(actions).length && !Object.keys(getters).length && !Object.keys(mutations).length) {
     return null
   }
 
   return new Vuex.Store({
     actions,
-    getters
+    getters,
+    mutations
   })
 }
