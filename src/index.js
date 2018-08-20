@@ -98,17 +98,22 @@ function createSlots (slots, h) {
 export function shallow (component, ...args) {
   const c = { ...component }
   c.components = { ...component.components }
-  shallowRenderComponents(c)
+  shallowRenderComponents(c, ...args)
   return mount(c, ...args)
 }
 
-function shallowRenderComponents (component) {
+function shallowRenderComponents (component, depth) {
   /* istanbul ignore if */
+  depth = depth || 0
   if (!component.components) return
   Object.keys(component.components).forEach(c => {
-    const tag = kebabCase(c)
-    component.components[c] = { template: `<${tag}></${tag}>` }
-    Vue.config.ignoredElements.push(tag)
+    if (depth > 0) {
+      shallowRenderComponents(component.components[c], depth - 1)
+    } else {
+      const tag = kebabCase(c)
+      component.components[c] = { template: `<${tag}></${tag}>` }
+      Vue.config.ignoredElements.push(tag)
+    }
   })
 }
 
@@ -127,7 +132,7 @@ export function build (component, defaultCallback) {
 export function buildShallow (component, ...args) {
   const c = { ...component }
   c.components = { ...component.components }
-  shallowRenderComponents(c)
+  shallowRenderComponents(c, ...args)
   return build(c, ...args)
 }
 
